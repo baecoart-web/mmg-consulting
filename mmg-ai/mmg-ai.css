@@ -49,13 +49,17 @@
      Specificație MMG: z-index 9999. */
   --mmg-z: 9999;
 
-  /* Poziționare FAB per specificație MMG:
-     - Desktop: right 40px, bottom 120px (deasupra butonului WhatsApp existent, cu spațiu vizibil)
-     - Mobil:   right 20px, bottom 110px
+  /* Poziționare FAB per specificație MMG (corecție overlap WhatsApp):
+     - Desktop:  right 40px, bottom 150px
+     - Tabletă:  right 30px, bottom 150px
+     - Mobil:    right 20px, bottom 150px
+     MMG AI stă deasupra WhatsApp cu minim 40-50px spațiu liber.
      WhatsApp-ul site-ului NU se modifică. */
-  --mmg-fab-bottom: 120px;
+  --mmg-fab-bottom: 150px;
   --mmg-fab-right: 40px;
-  --mmg-fab-bottom-mobile: 110px;
+  --mmg-fab-bottom-tablet: 150px;
+  --mmg-fab-right-tablet: 30px;
+  --mmg-fab-bottom-mobile: 150px;
   --mmg-fab-right-mobile: 20px;
 }
 
@@ -100,10 +104,11 @@
 
 /* ----------------------- Floating button ----------------------- */
 /* Deasupra butonului WhatsApp existent pe site-ul MMG.
-   Specificație MMG:
-   - Desktop: right 40px, bottom 120px, z-index 9999
-   - Mobil:   right 20px, bottom 110px
-   Spațiu vizibil între MMG AI și WhatsApp.
+   Specificație MMG (corecție overlap):
+   - Desktop:  right 40px, bottom 150px, z-index 9999
+   - Tabletă:  right 30px, bottom 150px
+   - Mobil:    right 20px, bottom 150px
+   Spațiu liber minim 40-50px între MMG AI și WhatsApp.
    WhatsApp-ul site-ului NU se modifică. */
 .mmg-fab {
   position: fixed;
@@ -249,6 +254,18 @@
   transform: translateY(0) scale(1);
 }
 
+/* Tabletă — viewport între 601px și 1024px */
+@media (max-width: 1024px) {
+  .mmg-fab {
+    bottom: var(--mmg-fab-bottom-tablet);
+    right: var(--mmg-fab-right-tablet);
+  }
+  .mmg-chat {
+    bottom: var(--mmg-fab-bottom-tablet);
+    right: var(--mmg-fab-right-tablet);
+  }
+}
+
 /* Mobil — pe orice viewport sub 600px (inclusiv telefoane cu viewport meta necorespunzător) */
 @media (max-width: 600px) {
   .mmg-chat {
@@ -274,6 +291,16 @@
   right: var(--mmg-fab-right-mobile);
   width: 56px;
   height: 56px;
+}
+
+/* Backup pentru tabletă detectată manual (clasă .is-tablet adăugată din JS) */
+.mmg-widget.is-tablet .mmg-fab {
+  bottom: var(--mmg-fab-bottom-tablet);
+  right: var(--mmg-fab-right-tablet);
+}
+.mmg-widget.is-tablet .mmg-chat {
+  bottom: var(--mmg-fab-bottom-tablet);
+  right: var(--mmg-fab-right-tablet);
 }
 .mmg-widget.is-mobile .mmg-chat {
   width: 100vw;

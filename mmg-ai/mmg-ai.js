@@ -824,12 +824,26 @@
     return vw <= 600 || (uaMobile && (vw <= 1024 || hasTouch)) || (hasTouch && vw <= 900);
   }
 
+  function detectTablet() {
+    // Tabletă: viewport între 601px și 1024px, sau UA conține iPad/Android tablet
+    var vw = window.innerWidth || document.documentElement.clientWidth || 1024;
+    var ua = (navigator.userAgent || "").toLowerCase();
+    var uaTablet = /ipad|android(?!.*mobile)|tablet|kindle|silk|playbook/.test(ua);
+    if (detectMobile()) return false; // mobil are prioritate
+    return (vw > 600 && vw <= 1024) || uaTablet;
+  }
+
   function applyMobileClass() {
     if (!widgetRoot) return;
     if (detectMobile()) {
       widgetRoot.classList.add("is-mobile");
+      widgetRoot.classList.remove("is-tablet");
+    } else if (detectTablet()) {
+      widgetRoot.classList.add("is-tablet");
+      widgetRoot.classList.remove("is-mobile");
     } else {
       widgetRoot.classList.remove("is-mobile");
+      widgetRoot.classList.remove("is-tablet");
     }
   }
 
