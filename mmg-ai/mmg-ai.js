@@ -858,19 +858,26 @@
     }
 
     // Detectare dinamică a butonului WhatsApp pentru a evita suprapunerea.
-    // Caută butonul WhatsApp real pe pagină și setează FAB bottom = WA top + 50px spațiu liber.
-    // Dacă nu găsește WA, păstrează valorile default din CSS (150px pe toate breakpoint-urile).
+    // Caută butonul WhatsApp FLOTANT real pe pagină și setează FAB bottom = WA top + 80px spațiu liber.
+    // Filtrează CTA-uri din content (prea mari, nu sunt position:fixed/absolute).
+    // Dacă nu găsește WA flotant, păstrează valorile default din CSS (150px pe toate breakpoint-urile).
     function adjustFabAboveWhatsApp() {
       try {
-        var candidates = document.querySelectorAll('a, button, div, img');
+        var candidates = document.querySelectorAll('a, button, div, img, svg');
         var waEl = null;
         var waTopFromBottom = -1;
         var viewportH = window.innerHeight || document.documentElement.clientHeight;
+        var viewportW = window.innerWidth || document.documentElement.clientWidth;
         for (var i = 0; i < candidates.length; i++) {
           var elc = candidates[i];
           // Sărim peste elementele widget-ului nostru
           if (elc.closest && elc.closest('.mmg-widget')) continue;
           if (elc.offsetParent === null && elc.style.position !== 'fixed') continue;
+
+          // FILTRU CHEIE: doar elemente FLOTANTE (position fixed sau absolute)
+          var cs = getComputedStyle(elc);
+          if (cs.position !== 'fixed' && cs.position !== 'absolute') continue;
+
           var href = (elc.getAttribute && (elc.getAttribute('href') || '')) || '';
           var cls = (typeof elc.className === 'string' ? elc.className : '');
           var title = (elc.getAttribute && (elc.getAttribute('title') || elc.getAttribute('aria-label') || '')) || '';
@@ -878,14 +885,15 @@
           var blob = (href + ' ' + cls + ' ' + title + ' ' + src).toLowerCase();
           if (/wa\.me|whatsapp|wa-btn|wa_button|whatsapp-button|float.*wa|floating.*wa/.test(blob)) {
             var r = elc.getBoundingClientRect();
-            // Trebuie să fie vizibil și să aibă dimensiuni reale
-            if (r.width < 30 || r.height < 30) continue;
-            // Trebuie să fie în partea de jos a viewport-ului (bottom 0-300px)
+            // FAB-uri reale au dimensiuni moderate (30-100px). Excludem CTA-uri din content (>100px lățime).
+            if (r.width < 30 || r.width > 100) continue;
+            if (r.height < 30 || r.height > 100) continue;
+            // Trebuie să fie în partea de jos a viewport-ului (bottom 0-200px de jos)
             var distanceFromBottom = viewportH - r.bottom;
-            if (distanceFromBottom < 0 || distanceFromBottom > 400) continue;
-            // Trebuie să fie în partea dreapta (right 0-200px)
-            var distanceFromRight = (window.innerWidth || document.documentElement.clientWidth) - r.right;
-            if (distanceFromRight < 0 || distanceFromRight > 300) continue;
+            if (distanceFromBottom < 0 || distanceFromBottom > 200) continue;
+            // Trebuie să fie în colțul dreapta (right 0-100px de dreapta)
+            var distanceFromRight = viewportW - r.right;
+            if (distanceFromRight < 0 || distanceFromRight > 100) continue;
             // Luăm elementul cu top edge cel mai jos (cel mai aproape de marginea de jos)
             var topFromBottom = viewportH - r.top;
             if (topFromBottom > waTopFromBottom) {
