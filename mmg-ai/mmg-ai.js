@@ -885,8 +885,8 @@
           var blob = (href + ' ' + cls + ' ' + title + ' ' + src).toLowerCase();
           if (/wa\.me|whatsapp|wa-btn|wa_button|whatsapp-button|float.*wa|floating.*wa/.test(blob)) {
             var r = elc.getBoundingClientRect();
-            // FAB-uri reale au dimensiuni moderate (30-100px). Excludem CTA-uri din content (>100px lățime).
-            if (r.width < 30 || r.width > 100) continue;
+            // FAB-uri reale + bule de text au dimensiuni 30-200px lățime. Excludem CTA-uri din content (>200px lățime).
+            if (r.width < 30 || r.width > 200) continue;
             if (r.height < 30 || r.height > 100) continue;
             // Trebuie să fie în partea de jos a viewport-ului (bottom 0-200px de jos)
             var distanceFromBottom = viewportH - r.bottom;
