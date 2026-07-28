@@ -858,12 +858,12 @@
     }
 
     // Detectare dinamică a butonului WhatsApp pentru a evita suprapunerea.
-    // Caută butonul WhatsApp FLOTANT real pe pagină și setează FAB bottom = WA top + 80px spațiu liber.
-    // Filtrează CTA-uri din content (prea mari, nu sunt position:fixed/absolute).
+    // Caută elementele WhatsApp FLOTANTE din colțul dreapta-jos și setează FAB bottom = WA top + 80px.
+    // Filtrează CTA-uri din content (prea mari sau prea la stânga).
     // Dacă nu găsește WA flotant, păstrează valorile default din CSS (150px pe toate breakpoint-urile).
     function adjustFabAboveWhatsApp() {
       try {
-        var candidates = document.querySelectorAll('a, button, div, img, svg');
+        var candidates = document.querySelectorAll('a, button, div, img, svg, span');
         var waEl = null;
         var waTopFromBottom = -1;
         var viewportH = window.innerHeight || document.documentElement.clientHeight;
@@ -872,11 +872,8 @@
           var elc = candidates[i];
           // Sărim peste elementele widget-ului nostru
           if (elc.closest && elc.closest('.mmg-widget')) continue;
+          // Sărim peste elemente ascunse
           if (elc.offsetParent === null && elc.style.position !== 'fixed') continue;
-
-          // FILTRU CHEIE: doar elemente FLOTANTE (position fixed sau absolute)
-          var cs = getComputedStyle(elc);
-          if (cs.position !== 'fixed' && cs.position !== 'absolute') continue;
 
           var href = (elc.getAttribute && (elc.getAttribute('href') || '')) || '';
           var cls = (typeof elc.className === 'string' ? elc.className : '');
@@ -885,16 +882,17 @@
           var blob = (href + ' ' + cls + ' ' + title + ' ' + src).toLowerCase();
           if (/wa\.me|whatsapp|wa-btn|wa_button|whatsapp-button|float.*wa|floating.*wa/.test(blob)) {
             var r = elc.getBoundingClientRect();
-            // FAB-uri reale + bule de text au dimensiuni 30-200px lățime. Excludem CTA-uri din content (>200px lățime).
+            // FAB-uri + bule de text au dimensiuni 30-200px lățime. Excludem CTA-uri din content (>200px lățime).
             if (r.width < 30 || r.width > 200) continue;
-            if (r.height < 30 || r.height > 100) continue;
-            // Trebuie să fie în partea de jos a viewport-ului (bottom 0-200px de jos)
+            if (r.height < 20 || r.height > 100) continue;
+            // Trebuie să fie în partea de jos a viewport-ului (bottom 0-150px de jos)
             var distanceFromBottom = viewportH - r.bottom;
-            if (distanceFromBottom < 0 || distanceFromBottom > 200) continue;
-            // Trebuie să fie în colțul dreapta (right 0-100px de dreapta)
+            if (distanceFromBottom < 0 || distanceFromBottom > 150) continue;
+            // Trebuie să fie CHIAR în colțul dreapta (right 0-60px de dreapta)
+            // Excludem CTA-uri din content care sunt mai la stânga (ex: btn-primary pe mobil are 64px)
             var distanceFromRight = viewportW - r.right;
-            if (distanceFromRight < 0 || distanceFromRight > 100) continue;
-            // Luăm elementul cu top edge cel mai jos (cel mai aproape de marginea de jos)
+            if (distanceFromRight < 0 || distanceFromRight > 60) continue;
+            // Luăm elementul cu top edge cel mai sus (topFromBottom maxim = cel mai aproape de marginea de sus a zonei WA)
             var topFromBottom = viewportH - r.top;
             if (topFromBottom > waTopFromBottom) {
               waTopFromBottom = topFromBottom;
