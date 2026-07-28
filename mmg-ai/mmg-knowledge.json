@@ -1,0 +1,313 @@
+{
+  "version": "3.0.0",
+  "_scope": "MMG AI Assistant este un asistent digital de prim contact. Folosește DOAR informații despre serviciile MMG și procesul de contactare. NU folosește istoricul firmei, ani, date externe sau presupuneri. Pentru orice întrebare în afara scope-ului, răspunde cu no_match_response.",
+
+  "company": {
+    "name": "MMG Accounting",
+    "tagline": "EXPERTIZĂ · ACURATEȚE · ÎNCREDERE",
+    "phone": "+40 748 364 907",
+    "email": "contact@mmgaccounting.ro",
+    "whatsapp": "40748364907",
+    "website": "https://mmgaccounting.ro",
+    "program": "Luni – Vineri: 09:00 – 18:00"
+  },
+
+  "agent": {
+    "name": "MMG AI Assistant",
+    "role": "Asistent digital",
+    "disclaimer": "Asistent digital MMG — vă conectează cu un consultant uman.",
+    "greeting": "Bună ziua!\n\nSunt MMG AI Assistant, asistentul digital MMG.\n\nCum vă pot ajuta?"
+  },
+
+  "quick_actions": [
+    { "id": "accounting",          "icon": "📄", "label": "Am nevoie de contabilitate" },
+    { "id": "new_company",         "icon": "🚀", "label": "Vreau să deschid o firmă" },
+    { "id": "change_accountant",   "icon": "🔄", "label": "Vreau să schimb contabilul" },
+    { "id": "tax_consulting",      "icon": "💰", "label": "Consultanță fiscală" },
+    { "id": "payroll",             "icon": "👥", "label": "Salarizare" },
+    { "id": "contact",             "icon": "📞", "label": "Contact MMG" }
+  ],
+
+  "flows": {
+    "accounting": {
+      "intro": "Vă ajut cu plăcere cu servicii de contabilitate. Ca să vă conectăm cu consultantul potrivit, am câteva întrebări scurte.",
+      "steps": [
+        {
+          "id": "has_company",
+          "question": "Aveți deja firmă înregistrată?",
+          "type": "choice",
+          "options": [
+            { "value": "da", "label": "Da, am firmă" },
+            { "value": "nu", "label": "Nu, încă nu" }
+          ],
+          "next": {
+            "da": "company_type",
+            "nu": "redirect:new_company"
+          }
+        },
+        {
+          "id": "company_type",
+          "question": "Ce tip de firmă aveți?",
+          "type": "choice",
+          "options": [
+            { "value": "srl",        "label": "SRL" },
+            { "value": "pfa",        "label": "PFA" },
+            { "value": "alta_forma", "label": "Altă formă" }
+          ],
+          "next": "domain"
+        },
+        {
+          "id": "domain",
+          "question": "Care este domeniul principal de activitate?",
+          "type": "choice",
+          "options": [
+            { "value": "comert",       "label": "Comerț" },
+            { "value": "servicii",     "label": "Servicii" },
+            { "value": "constructii",  "label": "Construcții" },
+            { "value": "productie",    "label": "Producție" },
+            { "value": "online",       "label": "Online / E-commerce" },
+            { "value": "alt_domeniu",  "label": "Alt domeniu" }
+          ],
+          "next": "employees"
+        },
+        {
+          "id": "employees",
+          "question": "Aveți angajați?",
+          "type": "choice",
+          "options": [
+            { "value": "0",   "label": "Nu am angajați" },
+            { "value": "1-5", "label": "1–5 angajați" },
+            { "value": "5+",  "label": "Peste 5 angajați" }
+          ],
+          "next": "documents"
+        },
+        {
+          "id": "documents",
+          "question": "Volum aproximativ documente lunare?",
+          "type": "choice",
+          "options": [
+            { "value": "1-20",   "label": "1–20 documente" },
+            { "value": "20-50",  "label": "20–50 documente" },
+            { "value": "50-100", "label": "50–100 documente" },
+            { "value": "100+",   "label": "Peste 100 documente" }
+          ],
+          "next": "lead_form"
+        }
+      ],
+      "summary_template": "Mulțumesc! Am notat informațiile. Vă conectăm cu un consultant MMG care vă va trimite o propunere personalizată de contabilitate."
+    },
+
+    "new_company": {
+      "intro": "Felicitări pentru noul proiect! Vă putem ajuta cu înființarea și cu serviciile contabile ulterioare. Câteva întrebări pentru a vă pregăti propunerea:",
+      "steps": [
+        {
+          "id": "company_form",
+          "question": "Doriți SRL sau PFA?",
+          "type": "choice",
+          "options": [
+            { "value": "srl",         "label": "SRL" },
+            { "value": "pfa",         "label": "PFA" },
+            { "value": "consultanta", "label": "Încă mă consult" }
+          ],
+          "next": "domain"
+        },
+        {
+          "id": "domain",
+          "question": "Care este domeniul activității?",
+          "type": "choice",
+          "options": [
+            { "value": "comert",       "label": "Comerț" },
+            { "value": "servicii",     "label": "Servicii" },
+            { "value": "constructii",  "label": "Construcții" },
+            { "value": "productie",    "label": "Producție" },
+            { "value": "online",       "label": "Online / E-commerce" },
+            { "value": "alt_domeniu",  "label": "Alt domeniu" }
+          ],
+          "next": "timeline"
+        },
+        {
+          "id": "timeline",
+          "question": "Când doriți să începeți?",
+          "type": "choice",
+          "options": [
+            { "value": "urgent",         "label": "Cât mai curând posibil" },
+            { "value": "luna_aceasta",   "label": "Luna aceasta" },
+            { "value": "1-3_luni",       "label": "În 1–3 luni" },
+            { "value": "ma_informez",    "label": "Doar mă informez" }
+          ],
+          "next": "monthly_accounting"
+        },
+        {
+          "id": "monthly_accounting",
+          "question": "Aveți nevoie și de servicii contabile după înființare?",
+          "type": "choice",
+          "options": [
+            { "value": "da",     "label": "Da" },
+            { "value": "nu",     "label": "Nu, doar înființare" },
+            { "value": "discut", "label": "Vreau să discut" }
+          ],
+          "next": "lead_form"
+        }
+      ],
+      "summary_template": "Excelent! Un consultant MMG vă va contacta cu pașii clari pentru înființare și opțiunile de contabilitate."
+    },
+
+    "change_accountant": {
+      "intro": "Înțeleg. Schimbarea contabilului este un pas important și vă putem face tranziția ușoară, fără întrerupere. Câteva întrebări:",
+      "steps": [
+        {
+          "id": "reason",
+          "question": "Care este motivul principal al schimbării?",
+          "type": "choice",
+          "options": [
+            { "value": "comunicare",   "label": "Comunicare slabă" },
+            { "value": "consultanta",  "label": "Lipsă consultanță proactivă" },
+            { "value": "intarzieri",   "label": "Întârzieri repetate" },
+            { "value": "alt_motiv",    "label": "Alt motiv" }
+          ],
+          "next": "timeline"
+        },
+        {
+          "id": "timeline",
+          "question": "Când doriți schimbarea?",
+          "type": "choice",
+          "options": [
+            { "value": "imediat",          "label": "Imediat" },
+            { "value": "perioada_urmatoare", "label": "În perioada următoare" },
+            { "value": "doar_informatii",  "label": "Doar informații" }
+          ],
+          "next": "lead_form"
+        }
+      ],
+      "summary_template": "Mulțumesc pentru încredere. Consultantul MMG vă va contacta pentru a vă explica procesul simplu de preluare — ne ocupăm noi de transferul documentelor."
+    },
+
+    "tax_consulting": {
+      "intro": "Vă ajut cu plăcere. Consultanța fiscală este un domeniu sensibil — vă conectăm direct cu un consultant MMG. O întrebare scurtă:",
+      "steps": [
+        {
+          "id": "topic",
+          "question": "Cu ce aveți nevoie de ajutor?",
+          "type": "choice",
+          "options": [
+            { "value": "taxe",              "label": "Taxe" },
+            { "value": "tva",               "label": "TVA" },
+            { "value": "impozite",          "label": "Impozite" },
+            { "value": "situatie_fiscala",  "label": "Situație fiscală" },
+            { "value": "alt_subiect",       "label": "Alt subiect" }
+          ],
+          "next": "lead_form"
+        }
+      ],
+      "summary_template": "Am înțeles. Un consultant fiscal MMG vă va contacta pentru a evalua situația și a vă oferi pașii corecți. Până atunci, vă rugăm să nu luați decizii fiscale pe baza acestui chat."
+    },
+
+    "payroll": {
+      "intro": "Vă ajut cu servicii de salarizare. Câteva întrebări pentru a vă pregăti o propunere corectă:",
+      "steps": [
+        {
+          "id": "employee_count",
+          "question": "Câți angajați aveți?",
+          "type": "choice",
+          "options": [
+            { "value": "0",    "label": "Nu am angajați" },
+            { "value": "1-5",  "label": "1–5 angajați" },
+            { "value": "6-20", "label": "6–20 angajați" },
+            { "value": "20+",  "label": "Peste 20 angajați" }
+          ],
+          "next": "services_needed"
+        },
+        {
+          "id": "services_needed",
+          "question": "Ce servicii de salarizare doriți?",
+          "type": "choice",
+          "options": [
+            { "value": "complet",       "label": "Salarizare completă (REVISAL, fluturași, declarații)" },
+            { "value": "doar_calcule",  "label": "Doar calcule și fluturași" },
+            { "value": "consultanta",   "label": "Consultanță punctuală" },
+            { "value": "discut",        "label": "Vreau să discut" }
+          ],
+          "next": "lead_form"
+        }
+      ],
+      "summary_template": "Mulțumesc! Un consultant MMG vă va trimite o propunere de salarizare adaptată la numărul de angajați și serviciile de care aveți nevoie."
+    },
+
+    "contact": {
+      "intro": "Cu plăcere! Iată datele de contact MMG Accounting:",
+      "contact_block": {
+        "phone": "+40 748 364 907",
+        "email": "contact@mmgaccounting.ro",
+        "whatsapp_label": "Scrie pe WhatsApp",
+        "call_label": "Sună acum"
+      },
+      "cta": "Doriți să vă sune un consultant MMG? Lăsați-ne datele dvs. și vă contactăm noi."
+    }
+  },
+
+  "lead_form": {
+    "title": "Pentru a vă contacta un consultant MMG, am nevoie de câteva date:",
+    "fields": [
+      { "id": "name",    "label": "Nume",    "type": "text",     "required": true,  "placeholder": "Numele dvs." },
+      { "id": "phone",   "label": "Telefon", "type": "tel",      "required": true,  "placeholder": "07xx xxx xxx" },
+      { "id": "email",   "label": "Email",   "type": "email",    "required": false, "placeholder": "email@firma.ro" },
+      { "id": "company", "label": "Firmă",   "type": "text",     "required": false, "placeholder": "Nume firmă (opțional)" },
+      { "id": "message", "label": "Mesaj",   "type": "textarea", "required": false, "placeholder": "Detalii suplimentare (opțional)" }
+    ],
+    "submit_label": "Trimite solicitarea",
+    "success_message": "Mulțumim! Solicitarea a fost înregistrată. Un consultant MMG vă va contacta în cel mai scurt timp. Pentru răspuns imediat, puteți continua pe WhatsApp:",
+    "whatsapp_button_label": "💬 Continuă pe WhatsApp",
+    "privacy_note": "Datele dvs. sunt folosite exclusiv pentru a vă contacta. Nu le transmitem terților."
+  },
+
+  "fallback_answers": [
+    {
+      "keywords": ["pret", "preț", "cat costa", "cât costă", "tarif", "onorariu"],
+      "answer": "Onorariile MMG Accounting se stabilesc în funcție de tipul firmei, volumul lunar de documente și serviciile de care aveți nevoie. Vă putem trimite o propunere personalizată — lăsați-ne datele dvs. de contact și vă răspundem cu o ofertă concretă."
+    },
+    {
+      "keywords": ["program", "orar", "cand lucrati", "când lucrați"],
+      "answer": "Programul MMG Accounting este Luni–Vineri, 09:00 – 18:00. Asistentul digital este disponibil 24/7 pentru a prelua solicitările, iar un consultant uman vă contactează în orele de program."
+    },
+    {
+      "keywords": ["servicii", "ce faceti", "ce faceți", "oferta", "ce oferiti"],
+      "answer": "MMG Accounting oferă servicii complete de contabilitate, fiscalitate, salarizare, înființare firme și schimb de contabil. Selectați una dintre opțiunile de mai jos pentru detalii și propunere personalizată."
+    },
+    {
+      "keywords": ["contabilitate", "evidenta", "registre", "bilant"],
+      "answer": "Da, MMG Accounting oferă servicii complete de contabilitate lunară. Selectați „Am nevoie de contabilitate” din meniul principal pentru a începe calificarea și a primi o propunere personalizată."
+    },
+    {
+      "keywords": ["infiintare", "înființare", "deschid firma", "deschide firma", "firma noua", "firmă nouă", "pfa", "srl"],
+      "answer": "Da, MMG Accounting vă ajută cu înființarea firmei (SRL, PFA, SRL-D) și cu serviciile contabile ulterioare. Selectați „Vreau să deschid o firmă” din meniul principal."
+    },
+    {
+      "keywords": ["schimb contabil", "schimb contabilul", "alt contabil", "contabil nou", "predare"],
+      "answer": "Da, MMG Accounting preia tranziția către un nou contabil fără întrerupere — ne ocupăm noi de transferul documentelor. Selectați „Vreau să schimb contabilul” din meniul principal."
+    },
+    {
+      "keywords": ["salarizare", "salarii", "angajat", "angajati", "fluturasi", "fluturași", "revisal"],
+      "answer": "Da, MMG Accounting oferă servicii complete de salarizare (REVISAL, fluturași, declarații). Selectați „Salarizare” din meniul principal."
+    },
+    {
+      "keywords": ["contact", "telefon", "email", "whatsapp", "va sun", "sunati", "contactati"],
+      "answer": "Ne puteți contacta telefonic la +40 748 364 907, pe WhatsApp la același număr, sau pe email la contact@mmgaccounting.ro. Selectați „Contact MMG” din meniu pentru butoane rapide."
+    },
+    {
+      "keywords": ["multumesc", "ms", "mersi", "thank"],
+      "answer": "Cu plăcere! Dacă aveți și alte întrebări, sunt aici. Selectați o opțiune din meniu sau lăsați-ne datele dvs. de contact pentru a vă contacta un consultant MMG."
+    },
+    {
+      "keywords": ["buna", "buna ziua", "salut", "hello", "hi", "neata"],
+      "answer": "Bună ziua! Sunt MMG AI Assistant, asistentul digital MMG. Vă pot ajuta cu informații despre serviciile noastre sau vă pot ghida către soluția potrivită. Selectați o opțiune din meniu."
+    },
+    {
+      "keywords": ["la revedere", "pa", "bye", "noapte buna"],
+      "answer": "La revedere! Vă așteptăm oricând. Dacă doriți să vă contacteze un consultant MMG, lăsați-ne datele dvs. de contact."
+    }
+  ],
+
+  "no_match_response": "Nu am această informație. Vă pot ajuta cu informații despre serviciile MMG sau vă pot pune în legătură cu echipa noastră.",
+
+  "disclaimer": "Asistentul digital MMG vă conectează cu un consultant uman. Nu oferă consultanță fiscală sau contabilă definitivă prin acest chat."
+}
