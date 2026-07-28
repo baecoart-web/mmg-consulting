@@ -814,6 +814,25 @@
   }
 
   /* ----------------------- Build UI ----------------------- */
+  function detectMobile() {
+    // Detectare robustă: viewport mic OR user agent mobil OR touch screen
+    var vw = window.innerWidth || document.documentElement.clientWidth || 1024;
+    var ua = (navigator.userAgent || "").toLowerCase();
+    var uaMobile = /android|iphone|ipad|ipod|blackberry|opera mini|iemobile|windows phone|mobile/.test(ua);
+    var hasTouch = (navigator.maxTouchPoints || 0) > 0;
+    // Telefoanele fără viewport meta raportează vw mare (ex: 980px) — dacă UA e mobil, considerăm mobil
+    return vw <= 600 || (uaMobile && (vw <= 1024 || hasTouch)) || (hasTouch && vw <= 900);
+  }
+
+  function applyMobileClass() {
+    if (!widgetRoot) return;
+    if (detectMobile()) {
+      widgetRoot.classList.add("is-mobile");
+    } else {
+      widgetRoot.classList.remove("is-mobile");
+    }
+  }
+
   function buildWidget() {
     widgetRoot = el("div", { class: "mmg-widget" });
 
@@ -834,7 +853,7 @@
       '<span class="mmg-fab-pulse"></span>' +
       '<span class="mmg-fab-badge">1</span>' +
       '<span class="mmg-fab-sparkle">✨</span>' +
-      '<span class="mmg-fab-icon">' + svg('<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>') + "</span>" +
+      '<img class="mmg-fab-avatar" src="' + AVATAR_URL + '" alt="MMG AI Assistant" loading="lazy" onerror="this.style.display=\'none\'"/>' +
       '<span class="mmg-fab-label">MMG AI<span class="mmg-fab-label-sub">Asistent digital</span></span>';
     fab.addEventListener("click", toggleChat);
     widgetRoot.appendChild(fab);
@@ -915,6 +934,16 @@
 
     widgetRoot.appendChild(chat);
     document.body.appendChild(widgetRoot);
+
+    // Aplică clasa de mobil după build
+    applyMobileClass();
+
+    // Re-aplică la resize (pentru orientare, desktop → mobil etc.)
+    var resizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(applyMobileClass, 150);
+    });
   }
 
   function doSend() {

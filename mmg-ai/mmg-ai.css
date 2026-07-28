@@ -44,17 +44,19 @@
 
   --mmg-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* Z-index mare ca să stea peste orice element al site-ului (inclusiv header-uri sticky)
-     Site-ul MMG folosește z-index-uri mici (< 1000), deci 9999 e suficient.
-     Păstrăm 2147483000 intern pentru a evita conflicte cu alte widget-uri terțe (chat-uri, cookie banners). */
-  --mmg-z: 2147483000;
+  /* Z-index potrivit pentru a sta deasupra elementelor site-ului (inclusiv header-uri sticky),
+     dar fără a intra în conflict cu widget-uri terțe (ex: chat-uri suport, cookie banners).
+     Specificație MMG: z-index 9999. */
+  --mmg-z: 9999;
 
-  /* Poziționare FAB — ajustabil via data-mmg-fab-bottom pe embed script.
-     Default: 110px ca să stea deasupra butonului WhatsApp existent pe mmgaccounting.ro
-     (butonul WA e la bottom: 40px = 2.5rem, width/height: 58px → top edge la 98px).
-     110px oferă 12px gap de respirat între FAB și WhatsApp. */
-  --mmg-fab-bottom: 110px;
+  /* Poziționare FAB per specificație MMG:
+     - Desktop: right 40px, bottom 120px (deasupra butonului WhatsApp existent, cu spațiu vizibil)
+     - Mobil:   right 20px, bottom 110px
+     WhatsApp-ul site-ului NU se modifică. */
+  --mmg-fab-bottom: 120px;
   --mmg-fab-right: 40px;
+  --mmg-fab-bottom-mobile: 110px;
+  --mmg-fab-right-mobile: 20px;
 }
 
 /* ----------------------- Reset within widget ----------------------- */
@@ -98,12 +100,15 @@
 
 /* ----------------------- Floating button ----------------------- */
 /* Deasupra butonului WhatsApp existent pe site-ul MMG.
-   Poziția e ajustabilă via data-mmg-fab-bottom pe <script src="embed.min.js">.
-   Nu modifică layout-ul site-ului (position: fixed, z-index mare). */
+   Specificație MMG:
+   - Desktop: right 40px, bottom 120px, z-index 9999
+   - Mobil:   right 20px, bottom 110px
+   Spațiu vizibil între MMG AI și WhatsApp.
+   WhatsApp-ul site-ului NU se modifică. */
 .mmg-fab {
   position: fixed;
-  bottom: var(--mmg-fab-bottom);  /* default 88px — deasupra WhatsApp */
-  right: var(--mmg-fab-right);    /* default 24px */
+  bottom: var(--mmg-fab-bottom);
+  right: var(--mmg-fab-right);
   width: 64px;
   height: 64px;
   border-radius: 50%;
@@ -116,6 +121,18 @@
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   z-index: var(--mmg-z);
   border: 3px solid var(--mmg-white);
+}
+
+.mmg-fab-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.mmg-fab.is-open .mmg-fab-avatar {
+  display: none;
 }
 
 .mmg-fab:hover {
@@ -232,7 +249,8 @@
   transform: translateY(0) scale(1);
 }
 
-@media (max-width: 480px) {
+/* Mobil — pe orice viewport sub 600px (inclusiv telefoane cu viewport meta necorespunzător) */
+@media (max-width: 600px) {
   .mmg-chat {
     width: 100vw;
     height: 100vh;
@@ -243,11 +261,28 @@
     border: none;
   }
   .mmg-fab {
-    bottom: calc(var(--mmg-fab-bottom) - 8px);  /* puțin mai jos pe mobil */
-    right: 16px;
+    bottom: var(--mmg-fab-bottom-mobile);
+    right: var(--mmg-fab-right-mobile);
     width: 56px;
     height: 56px;
   }
+}
+
+/* Backup pentru telefoane care raportează viewport mare (ex: viewport meta lipsă) */
+.mmg-widget.is-mobile .mmg-fab {
+  bottom: var(--mmg-fab-bottom-mobile);
+  right: var(--mmg-fab-right-mobile);
+  width: 56px;
+  height: 56px;
+}
+.mmg-widget.is-mobile .mmg-chat {
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  bottom: 0;
+  right: 0;
+  border-radius: 0;
+  border: none;
 }
 
 /* ----------------------- Header ----------------------- */
