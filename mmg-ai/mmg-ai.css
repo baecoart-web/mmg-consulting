@@ -49,18 +49,24 @@
      Specificație MMG: z-index 9999. */
   --mmg-z: 9999;
 
-  /* Poziționare FAB per specificație MMG (corecție overlap WhatsApp):
-     - Desktop:  right 40px, bottom 150px
-     - Tabletă:  right 30px, bottom 150px
-     - Mobil:    right 20px, bottom 150px
-     MMG AI stă deasupra WhatsApp cu minim 40-50px spațiu liber.
-     WhatsApp-ul site-ului NU se modifică. */
-  --mmg-fab-bottom: 150px;
+  /* Poziționare SEPARATĂ pentru FAB și fereastra chat:
+     - FAB-ul stă deasupra WhatsApp (neschimbat poziția WA-ului)
+     - Chat-ul deschis rămâne jos pe ecran, complet vizibil
+     Nu mai folosim aceeași variabilă pentru ambele. */
+
+  /* 1. BUTON FAB (închis) — deasupra WhatsApp */
+  --mmg-fab-bottom: 130px;        /* Desktop */
   --mmg-fab-right: 40px;
-  --mmg-fab-bottom-tablet: 150px;
+  --mmg-fab-bottom-tablet: 130px; /* Tabletă */
   --mmg-fab-right-tablet: 30px;
-  --mmg-fab-bottom-mobile: 150px;
+  --mmg-fab-bottom-mobile: 120px; /* Mobil */
   --mmg-fab-right-mobile: 20px;
+
+  /* 2. FEREASTRA CHAT (deschisă) — separată de FAB, rămâne jos */
+  --mmg-chat-bottom: 20px;        /* Desktop + Tabletă */
+  --mmg-chat-right: 40px;
+  --mmg-chat-bottom-mobile: 10px; /* Mobil */
+  --mmg-chat-right-mobile: 20px;
 }
 
 /* ----------------------- Reset within widget ----------------------- */
@@ -104,11 +110,10 @@
 
 /* ----------------------- Floating button ----------------------- */
 /* Deasupra butonului WhatsApp existent pe site-ul MMG.
-   Specificație MMG (corecție overlap):
-   - Desktop:  right 40px, bottom 150px, z-index 9999
-   - Tabletă:  right 30px, bottom 150px
-   - Mobil:    right 20px, bottom 150px
-   Spațiu liber minim 40-50px între MMG AI și WhatsApp.
+   Specificație MMG:
+   - Desktop:  right 40px, bottom 130px, z-index 9999
+   - Tabletă:  right 30px, bottom 130px
+   - Mobil:    right 20px, bottom 120px
    WhatsApp-ul site-ului NU se modifică. */
 .mmg-fab {
   position: fixed;
@@ -227,14 +232,17 @@
 }
 
 /* ----------------------- Chat window ----------------------- */
+/* FEREASTRA CHAT — poziție SEPARATĂ de FAB.
+   Chat-ul rămâne jos pe ecran, complet vizibil.
+   Nu urmează poziția FAB-ului (care stă mai sus peste WhatsApp). */
 .mmg-chat {
   position: fixed;
-  bottom: var(--mmg-fab-bottom);  /* aliniat cu FAB-ul */
-  right: var(--mmg-fab-right);
+  bottom: var(--mmg-chat-bottom);  /* separat de FAB — rămâne jos */
+  right: var(--mmg-chat-right);
   width: 380px;
   max-width: calc(100vw - 32px);
   height: 620px;
-  max-height: calc(100vh - 130px);
+  max-height: calc(100vh - 60px);  /* spațiu de sus ca să nu fie tăiat */
   background: var(--mmg-charcoal);
   border-radius: var(--mmg-radius-lg);
   box-shadow: var(--mmg-shadow-lg);
@@ -261,21 +269,22 @@
     right: var(--mmg-fab-right-tablet);
   }
   .mmg-chat {
-    bottom: var(--mmg-fab-bottom-tablet);
-    right: var(--mmg-fab-right-tablet);
+    bottom: var(--mmg-chat-bottom);  /* chat rămâne jos, separăm de FAB */
+    right: var(--mmg-chat-right);
   }
 }
 
-/* Mobil — pe orice viewport sub 600px (inclusiv telefoane cu viewport meta necorespunzător) */
+/* Mobil — pe orice viewport sub 600px */
 @media (max-width: 600px) {
   .mmg-chat {
     width: 100vw;
-    height: 100vh;
-    max-height: 100vh;
-    bottom: 0;
-    right: 0;
-    border-radius: 0;
-    border: none;
+    max-height: calc(100vh - 100px);  /* header + mesaje vizibile, nu tăiate */
+    height: calc(100vh - 100px);
+    bottom: var(--mmg-chat-bottom-mobile);  /* 10px de jos */
+    right: var(--mmg-chat-right-mobile);
+    border-radius: var(--mmg-radius-md);
+    border: 1px solid var(--mmg-border-light);
+    overflow: hidden;
   }
   .mmg-fab {
     bottom: var(--mmg-fab-bottom-mobile);
@@ -299,17 +308,17 @@
   right: var(--mmg-fab-right-tablet);
 }
 .mmg-widget.is-tablet .mmg-chat {
-  bottom: var(--mmg-fab-bottom-tablet);
-  right: var(--mmg-fab-right-tablet);
+  bottom: var(--mmg-chat-bottom);
+  right: var(--mmg-chat-right);
 }
 .mmg-widget.is-mobile .mmg-chat {
   width: 100vw;
-  height: 100vh;
-  max-height: 100vh;
-  bottom: 0;
-  right: 0;
-  border-radius: 0;
-  border: none;
+  max-height: calc(100vh - 100px);
+  height: calc(100vh - 100px);
+  bottom: var(--mmg-chat-bottom-mobile);
+  right: var(--mmg-chat-right-mobile);
+  border-radius: var(--mmg-radius-md);
+  overflow: hidden;
 }
 
 /* ----------------------- Header ----------------------- */

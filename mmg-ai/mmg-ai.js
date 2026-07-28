@@ -857,73 +857,11 @@
       } catch (e) {}
     }
 
-    // Detectare dinamică a butonului WhatsApp pentru a evita suprapunerea.
-    // Caută elementele WhatsApp FLOTANTE din colțul dreapta-jos și setează FAB bottom = WA top + 80px.
-    // Filtrează CTA-uri din content (prea mari sau prea la stânga).
-    // Dacă nu găsește WA flotant, păstrează valorile default din CSS (150px pe toate breakpoint-urile).
-    function adjustFabAboveWhatsApp() {
-      try {
-        var candidates = document.querySelectorAll('a, button, div, img, svg, span');
-        var waEl = null;
-        var waTopFromBottom = -1;
-        var viewportH = window.innerHeight || document.documentElement.clientHeight;
-        var viewportW = window.innerWidth || document.documentElement.clientWidth;
-        for (var i = 0; i < candidates.length; i++) {
-          var elc = candidates[i];
-          // Sărim peste elementele widget-ului nostru
-          if (elc.closest && elc.closest('.mmg-widget')) continue;
-          // Sărim peste elemente ascunse
-          if (elc.offsetParent === null && elc.style.position !== 'fixed') continue;
-
-          var href = (elc.getAttribute && (elc.getAttribute('href') || '')) || '';
-          var cls = (typeof elc.className === 'string' ? elc.className : '');
-          var title = (elc.getAttribute && (elc.getAttribute('title') || elc.getAttribute('aria-label') || '')) || '';
-          var src = (elc.getAttribute && (elc.getAttribute('src') || '')) || '';
-          var blob = (href + ' ' + cls + ' ' + title + ' ' + src).toLowerCase();
-          if (/wa\.me|whatsapp|wa-btn|wa_button|whatsapp-button|float.*wa|floating.*wa/.test(blob)) {
-            var r = elc.getBoundingClientRect();
-            // FAB-uri + bule de text au dimensiuni 30-200px lățime. Excludem CTA-uri din content (>200px lățime).
-            if (r.width < 30 || r.width > 200) continue;
-            if (r.height < 20 || r.height > 100) continue;
-            // Trebuie să fie în partea de jos a viewport-ului (bottom 0-150px de jos)
-            var distanceFromBottom = viewportH - r.bottom;
-            if (distanceFromBottom < 0 || distanceFromBottom > 150) continue;
-            // Trebuie să fie CHIAR în colțul dreapta (right 0-60px de dreapta)
-            // Excludem CTA-uri din content care sunt mai la stânga (ex: btn-primary pe mobil are 64px)
-            var distanceFromRight = viewportW - r.right;
-            if (distanceFromRight < 0 || distanceFromRight > 60) continue;
-            // Luăm elementul cu top edge cel mai sus (topFromBottom maxim = cel mai aproape de marginea de sus a zonei WA)
-            var topFromBottom = viewportH - r.top;
-            if (topFromBottom > waTopFromBottom) {
-              waTopFromBottom = topFromBottom;
-              waEl = elc;
-            }
-          }
-        }
-        if (waEl && waTopFromBottom > 0) {
-          // FAB bottom = WA top + 120px spațiu liber
-          // (80px pentru cerința 40-50px + 40px compensare pentru eticheta FAB "MMG AI / Asistent digital"
-          // care se extinde ~48px sub FAB bottom la bottom:-28px)
-          var newBottom = waTopFromBottom + 120;
-          // Limită superioară: nu muta FAB-ul prea sus (max 420px pe desktop, 360px pe mobil)
-          var maxBottom = (viewportH < 600) ? 360 : 420;
-          if (newBottom > maxBottom) newBottom = maxBottom;
-          // Limită inferioară: minim 150px (dacă WA e mai sus de atât, păstrăm 150)
-          if (newBottom < 150) newBottom = 150;
-          document.documentElement.style.setProperty("--mmg-fab-bottom", newBottom + "px");
-          document.documentElement.style.setProperty("--mmg-fab-bottom-tablet", newBottom + "px");
-          document.documentElement.style.setProperty("--mmg-fab-bottom-mobile", newBottom + "px");
-        }
-      } catch (e) {}
-    }
-    // Rulează imediat, după 1s (pentru WA încărcat asincron), și pe resize
-    setTimeout(adjustFabAboveWhatsApp, 100);
-    setTimeout(adjustFabAboveWhatsApp, 1000);
-    setTimeout(adjustFabAboveWhatsApp, 3000);
-    window.addEventListener("resize", function() {
-      clearTimeout(window.__mmgWaResize);
-      window.__mmgWaResize = setTimeout(adjustFabAboveWhatsApp, 250);
-    });
+    // NOTĂ: Pozițiile FAB și chat sunt SEPARATE în CSS (variabile distincte):
+    //   --mmg-fab-bottom-*  pentru butonul FAB (deasupra WhatsApp)
+    //   --mmg-chat-bottom-* pentru fereastra chat (rămâne jos, complet vizibilă)
+    // Nu mai calculăm dinamic poziția FAB față de WhatsApp — valorile fixe din CSS
+    // respectă specificația: FAB 130px (desktop/tablet) / 120px (mobil), chat 20px / 10px.
 
     // FAB
     fab = el("button", {
