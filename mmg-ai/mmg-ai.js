@@ -895,10 +895,10 @@
           }
         }
         if (waEl && waTopFromBottom > 0) {
-          // FAB bottom = WA top + 50px spațiu liber (minim 40-50px per cerință)
-          var newBottom = waTopFromBottom + 50;
-          // Limită superioară: nu muta FAB-ul prea sus (max 350px pe desktop, 280px pe mobil)
-          var maxBottom = (viewportH < 600) ? 280 : 350;
+          // FAB bottom = WA top + 80px spațiu liber (cerință minim 40-50px, cu margine de siguranță)
+          var newBottom = waTopFromBottom + 80;
+          // Limită superioară: nu muta FAB-ul prea sus (max 380px pe desktop, 320px pe mobil)
+          var maxBottom = (viewportH < 600) ? 320 : 380;
           if (newBottom > maxBottom) newBottom = maxBottom;
           // Limită inferioară: minim 150px (dacă WA e mai sus de atât, păstrăm 150)
           if (newBottom < 150) newBottom = 150;
