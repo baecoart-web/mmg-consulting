@@ -857,6 +857,66 @@
       } catch (e) {}
     }
 
+    // Detectare dinamică a butonului WhatsApp pentru a evita suprapunerea.
+    // Caută butonul WhatsApp real pe pagină și setează FAB bottom = WA top + 50px spațiu liber.
+    // Dacă nu găsește WA, păstrează valorile default din CSS (150px pe toate breakpoint-urile).
+    function adjustFabAboveWhatsApp() {
+      try {
+        var candidates = document.querySelectorAll('a, button, div, img');
+        var waEl = null;
+        var waTopFromBottom = -1;
+        var viewportH = window.innerHeight || document.documentElement.clientHeight;
+        for (var i = 0; i < candidates.length; i++) {
+          var elc = candidates[i];
+          // Sărim peste elementele widget-ului nostru
+          if (elc.closest && elc.closest('.mmg-widget')) continue;
+          if (elc.offsetParent === null && elc.style.position !== 'fixed') continue;
+          var href = (elc.getAttribute && (elc.getAttribute('href') || '')) || '';
+          var cls = (typeof elc.className === 'string' ? elc.className : '');
+          var title = (elc.getAttribute && (elc.getAttribute('title') || elc.getAttribute('aria-label') || '')) || '';
+          var src = (elc.getAttribute && (elc.getAttribute('src') || '')) || '';
+          var blob = (href + ' ' + cls + ' ' + title + ' ' + src).toLowerCase();
+          if (/wa\.me|whatsapp|wa-btn|wa_button|whatsapp-button|float.*wa|floating.*wa/.test(blob)) {
+            var r = elc.getBoundingClientRect();
+            // Trebuie să fie vizibil și să aibă dimensiuni reale
+            if (r.width < 30 || r.height < 30) continue;
+            // Trebuie să fie în partea de jos a viewport-ului (bottom 0-300px)
+            var distanceFromBottom = viewportH - r.bottom;
+            if (distanceFromBottom < 0 || distanceFromBottom > 400) continue;
+            // Trebuie să fie în partea dreapta (right 0-200px)
+            var distanceFromRight = (window.innerWidth || document.documentElement.clientWidth) - r.right;
+            if (distanceFromRight < 0 || distanceFromRight > 300) continue;
+            // Luăm elementul cu top edge cel mai jos (cel mai aproape de marginea de jos)
+            var topFromBottom = viewportH - r.top;
+            if (topFromBottom > waTopFromBottom) {
+              waTopFromBottom = topFromBottom;
+              waEl = elc;
+            }
+          }
+        }
+        if (waEl && waTopFromBottom > 0) {
+          // FAB bottom = WA top + 50px spațiu liber (minim 40-50px per cerință)
+          var newBottom = waTopFromBottom + 50;
+          // Limită superioară: nu muta FAB-ul prea sus (max 350px pe desktop, 280px pe mobil)
+          var maxBottom = (viewportH < 600) ? 280 : 350;
+          if (newBottom > maxBottom) newBottom = maxBottom;
+          // Limită inferioară: minim 150px (dacă WA e mai sus de atât, păstrăm 150)
+          if (newBottom < 150) newBottom = 150;
+          document.documentElement.style.setProperty("--mmg-fab-bottom", newBottom + "px");
+          document.documentElement.style.setProperty("--mmg-fab-bottom-tablet", newBottom + "px");
+          document.documentElement.style.setProperty("--mmg-fab-bottom-mobile", newBottom + "px");
+        }
+      } catch (e) {}
+    }
+    // Rulează imediat, după 1s (pentru WA încărcat asincron), și pe resize
+    setTimeout(adjustFabAboveWhatsApp, 100);
+    setTimeout(adjustFabAboveWhatsApp, 1000);
+    setTimeout(adjustFabAboveWhatsApp, 3000);
+    window.addEventListener("resize", function() {
+      clearTimeout(window.__mmgWaResize);
+      window.__mmgWaResize = setTimeout(adjustFabAboveWhatsApp, 250);
+    });
+
     // FAB
     fab = el("button", {
       class: "mmg-fab",
